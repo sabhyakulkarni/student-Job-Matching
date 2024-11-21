@@ -1,12 +1,3 @@
-import { render, screen } from "@testing-library/react";
-import App from "./App";
-
-test("renders learn react link", () => {
-  render(<App />);
-  const linkElement = screen.getByText(/learn react/i);
-  expect(linkElement).toBeInTheDocument();
-});
-
 import React, { useState } from "react";
 import { library } from "@fortawesome/fontawesome-svg-core";
 import { fas } from "@fortawesome/free-solid-svg-icons";
@@ -21,10 +12,12 @@ function StudentDetailsForm() {
     academicDetails: [],
     achievements: [],
     skills: [],
-    loginDetails: { username: "", password: "", srn: "" },
+    loginDetails: { username: "", password: "" },
     student: { srn: "", name: "", dob: "", mobile: "", email: "" },
     studentAcademicSkills: [],
   });
+
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   const inputStyle = {
     width: "100%",
@@ -66,102 +59,139 @@ function StudentDetailsForm() {
     }));
   };
 
+  const handleRegister = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await fetch("http://localhost:3000/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData.loginDetails), // Send loginDetails directly
+      });
+      const data = await response.json();
+      if (response.ok) {
+        alert("Registration successful!");
+      } else {
+        alert(data.message || "Registration failed. Please try again.");
+      }
+    } catch (error) {
+      console.error("Error during registration:", error);
+      alert("An error occurred. Please try again.");
+    }
+  };
+
   return (
     <div style={{ maxWidth: "800px", margin: "0 auto", fontFamily: "Arial" }}>
       <h1 style={{ textAlign: "center", marginBottom: "30px" }}>
         Student Details Form
       </h1>
 
-      {/* Login Details */}
-      <h2>Login Details</h2>
-      <div style={sectionStyle}>
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            marginBottom: "10px",
-          }}
-        >
-          <FontAwesomeIcon
-            icon={["fas", "user"]}
-            style={{ marginRight: "8px", color: "#007bff" }}
-          />
-          <label>Username:</label>
-        </div>
-        <input
-          type="text"
-          name="username"
-          value={formData.loginDetails.username}
-          onChange={(e) =>
-            setFormData((prev) => ({
-              ...prev,
-              loginDetails: { ...prev.loginDetails, username: e.target.value },
-            }))
-          }
-          placeholder="Enter Username"
-          required
-          style={inputStyle}
-        />
+      {/* Login Details Section */}
+      {!isLoggedIn ? (
+        <>
+          <h2>Register Details</h2>
+          <div style={sectionStyle}>
+            <form onSubmit={handleRegister}>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  marginBottom: "10px",
+                }}
+              >
+                <FontAwesomeIcon
+                  icon={["fas", "user"]}
+                  style={{ marginRight: "8px", color: "#007bff" }}
+                />
+                <label>Username:</label>
+              </div>
+              <input
+                type="text"
+                name="username"
+                value={formData.loginDetails.username}
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    loginDetails: {
+                      ...prev.loginDetails,
+                      username: e.target.value,
+                    },
+                  }))
+                }
+                placeholder="Enter Username"
+                required
+                style={inputStyle}
+              />
 
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            marginBottom: "10px",
-          }}
-        >
-          <FontAwesomeIcon
-            icon={["fas", "key"]}
-            style={{ marginRight: "8px", color: "#007bff" }}
-          />
-          <label>Password:</label>
-        </div>
-        <input
-          type="password"
-          name="password"
-          value={formData.loginDetails.password}
-          onChange={(e) =>
-            setFormData((prev) => ({
-              ...prev,
-              loginDetails: { ...prev.loginDetails, password: e.target.value },
-            }))
-          }
-          placeholder="Enter Password"
-          required
-          style={inputStyle}
-        />
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  marginBottom: "10px",
+                }}
+              >
+                <FontAwesomeIcon
+                  icon={["fas", "key"]}
+                  style={{ marginRight: "8px", color: "#007bff" }}
+                />
+                <label>Password:</label>
+              </div>
+              <input
+                type="password"
+                name="password"
+                value={formData.loginDetails.password}
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    loginDetails: {
+                      ...prev.loginDetails,
+                      password: e.target.value,
+                    },
+                  }))
+                }
+                placeholder="Enter Password"
+                required
+                style={inputStyle}
+              />
 
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            marginBottom: "10px",
-          }}
-        >
-          <FontAwesomeIcon
-            icon={["fas", "id-card"]}
-            style={{ marginRight: "8px", color: "#007bff" }}
-          />
-          <label>SRN:</label>
-        </div>
-        <input
-          type="text"
-          name="login_srn"
-          value={formData.loginDetails.srn}
-          onChange={(e) =>
-            setFormData((prev) => ({
-              ...prev,
-              loginDetails: { ...prev.loginDetails, srn: e.target.value },
-            }))
-          }
-          placeholder="Enter SRN"
-          required
-          style={inputStyle}
-        />
-      </div>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  marginBottom: "10px",
+                }}
+              >
+                <FontAwesomeIcon
+                  icon={["fas", "id-card"]}
+                  style={{ marginRight: "8px", color: "#007bff" }}
+                />
+                <label>SRN:</label>
+              </div>
+              <input
+                type="text"
+                name="srn"
+                value={formData.loginDetails.srn}
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    loginDetails: { ...prev.loginDetails, srn: e.target.value },
+                  }))
+                }
+                placeholder="Enter SRN"
+                required
+                style={inputStyle}
+              />
 
+              <button type="submit" style={buttonStyle}>
+                Register
+              </button>
+            </form>
+          </div>
+        </>
+      ) : (
+        <> </>
+      )}
       {/* Student Details */}
-      <h2>Student</h2>
+      <h2>Student Details</h2>
       <div style={sectionStyle}>
         <div
           style={{
